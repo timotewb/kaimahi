@@ -18,7 +18,7 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --certificatesresolvers.myresolver.acme.tlschallenge=true
-      - --certificatesresolvers.myresolver.acme.email=UPDATEME@email.com
+      - --certificatesresolvers.myresolver.acme.email=timote.wb@gmail.com
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     restart: unless-stopped
     ports:

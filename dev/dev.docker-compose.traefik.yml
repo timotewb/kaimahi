@@ -7,11 +7,12 @@ x-logging: &x-logging
 
 services:
   traefik:
-    image: traefik:2.11
-    container_name: appwrite-traefik
+    image: traefik:v3.1
+    container_name: traefik
     <<: *x-logging
     command:
-      - --api.insecure=true
+      # - --api.insecure=true
+      - --api.dashboard=true
       - --providers.file.directory=/storage/config
       - --providers.file.watch=true
       - --providers.docker=true
@@ -19,20 +20,35 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --certificatesresolvers.myresolver.acme.tlschallenge=true
-      - --certificatesresolvers.myresolver.acme.email=email@email.com
+      - --certificatesresolvers.myresolver.acme.email=timote.wb@gmail.com
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.services.dashboard.loadbalancer.server.port=8080
+      #http
+      - traefik.http.routers.traefik_http.entrypoints=web
+      - traefik.http.routers.traefik_http.rule=Host(`traefik.timotewb.com`)
+      - traefik.http.routers.traefik_http.service=traefik
+      # https
+      - traefik.http.routers.traefik_https.entrypoints=websecure
+      - traefik.http.routers.traefik_https.rule=Host(`traefik.timotewb.com`)
+      - traefik.http.routers.traefik_https.service=traefik
+      - traefik.http.routers.traefik_https.tls=true
+      # certificates
+      - traefik.http.routers.traefik.tls.certresolver=myresolver
     restart: unless-stopped
     ports:
       - 80:80
-      - 8080:8080
+      # - 8080:8080
       - 443:443
     volumes:
       - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
       - appwrite-config:/storage/config:ro
       - appwrite-certificates:/storage/certificates:ro
-    depends_on:
-      - appwrite
+    # depends_on:
+    #   - appwrite
     networks:
       - gateway
       - appwrite

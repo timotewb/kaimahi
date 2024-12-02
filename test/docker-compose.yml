@@ -1,0 +1,20 @@
+
+networks:
+  proxy:
+    name: proxy
+  appwrite:
+    name: appwrite
+  runtimes:
+    name: runtimes
+
+volumes:
+  letsencrypt:
+    name: letsencrypt
+  appwrite-mariadb:
+  appwrite-redis:
+  appwrite-cache:
+  appwrite-uploads:
+  appwrite-certificates:
+  appwrite-functions:
+  appwrite-builds:
+  appwrite-config:
