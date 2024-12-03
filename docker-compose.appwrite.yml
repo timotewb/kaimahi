@@ -1,34 +1,22 @@
-x-logging: &x-logging
-  logging:
-    driver: "json-file"
-    options:
-      max-file: "5"
-      max-size: "10m"
-
 services:
   appwrite:
     image: appwrite/appwrite:1.6.0
     container_name: appwrite
-    <<: *x-logging
     restart: unless-stopped
     networks:
       - appwrite
     labels:
       - traefik.enable=true
-      - traefik.constraint-label-stack=appwrite
-      - traefik.docker.network=appwrite
       - traefik.http.services.appwrite_api.loadbalancer.server.port=80
-      #http
-      - traefik.http.routers.appwrite_api_http.entrypoints=web
-      - traefik.http.routers.appwrite_api_http.rule=Host(`appwrite.timotewb.com`)
-      - traefik.http.routers.appwrite_api_http.service=appwrite_api
-      # https
-      - traefik.http.routers.appwrite_api_https.entrypoints=websecure
-      - traefik.http.routers.appwrite_api_https.rule=Host(`appwrite.timotewb.com`)
-      - traefik.http.routers.appwrite_api_https.service=appwrite_api
-      - traefik.http.routers.appwrite_api_https.tls=true
-      # certificates
-      - traefik.http.routers.appwrite_api.tls.certresolver=myresolver
+      - traefik.http.routers.appwrite_api.entrypoints=websecure
+      - traefik.http.routers.appwrite_api.rule=(Host(`${APPWRITE_URL_ROOT}`) || Host(`www.${APPWRITE_URL_ROOT}`))
+      - traefik.http.routers.appwrite_api.service=appwrite_api
+      - traefik.http.routers.appwrite_api.tls=true
+      - traefik.http.routers.appwrite_api.tls.certresolver=certresolver
+
+      - traefik.http.middlewares.wwwredirect.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.wwwredirect.redirectregex.replacement=https://$${1}
+      - traefik.http.routers.appwrite_api.middlewares=wwwredirect
     volumes:
       - appwrite-uploads:/storage/uploads:rw
       - appwrite-cache:/storage/cache:rw
@@ -134,51 +122,41 @@ services:
       - _APP_ASSISTANT_OPENAI_API_KEY
 
   appwrite-console:
-    <<: *x-logging
     container_name: appwrite-console
     image: appwrite/console:5.0.12
     restart: unless-stopped
     networks:
       - appwrite
     labels:
-      - "traefik.enable=true"
-      - "traefik.constraint-label-stack=appwrite"
-      - "traefik.docker.network=appwrite"
-      - "traefik.http.services.appwrite_console.loadbalancer.server.port=80"
-      #ws
-      - traefik.http.routers.appwrite_console_http.entrypoints=web
-      - traefik.http.routers.appwrite_console_http.rule=Host(`appwrite.timotewb.com`) && PathPrefix(`/console`)
-      - traefik.http.routers.appwrite_console_http.service=appwrite_console
-      # wss
-      - traefik.http.routers.appwrite_console_https.entrypoints=websecure
-      - traefik.http.routers.appwrite_console_https.rule=Host(`appwrite.timotewb.com`) && PathPrefix(`/console`)
-      - traefik.http.routers.appwrite_console_https.service=appwrite_console
-      - traefik.http.routers.appwrite_console_https.tls=true
-      # certificates
-      - traefik.http.routers.appwrite_console.tls.certresolver=myresolver
+      - traefik.enable=true
+      - traefik.http.services.appwrite_console.loadbalancer.server.port=80
+      - traefik.http.routers.appwrite_console.entrypoints=websecure
+      - traefik.http.routers.appwrite_console.rule=(Host(`${APPWRITE_URL_ROOT}`) || Host(`www.${APPWRITE_URL_ROOT}`)) && PathPrefix(`/console`)
+      - traefik.http.routers.appwrite_console.service=appwrite_console
+      - traefik.http.routers.appwrite_console.tls=true
+      - traefik.http.routers.appwrite_console.tls.certresolver=certresolver
+
+      - traefik.http.middlewares.wwwredirect.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.wwwredirect.redirectregex.replacement=https://$${1}
+      - traefik.http.routers.appwrite_console.middlewares=wwwredirect
 
   appwrite-realtime:
     image: appwrite/appwrite:1.6.0
     entrypoint: realtime
     container_name: appwrite-realtime
-    <<: *x-logging
     restart: unless-stopped
     labels:
-      - "traefik.enable=true"
-      - "traefik.constraint-label-stack=appwrite"
-      - "traefik.docker.network=appwrite"
-      - "traefik.http.services.appwrite_realtime.loadbalancer.server.port=80"
-      #ws
-      - traefik.http.routers.appwrite_realtime_ws.entrypoints=web
-      - traefik.http.routers.appwrite_realtime_ws.rule=Host(`appwrite.timotewb.com`) && PathPrefix(`/v1/realtime`)
-      - traefik.http.routers.appwrite_realtime_ws.service=appwrite_realtime
-      # wss
-      - traefik.http.routers.appwrite_realtime_wss.entrypoints=websecure
-      - traefik.http.routers.appwrite_realtime_wss.rule=Host(`appwrite.timotewb.com`) && PathPrefix(`/v1/realtime`)
-      - traefik.http.routers.appwrite_realtime_wss.service=appwrite_realtime
-      - traefik.http.routers.appwrite_realtime_wss.tls=true
-      # certificates
-      - traefik.http.routers.appwrite_realtime.tls.certresolver=myresolver
+      - traefik.enable=true
+      - traefik.http.services.appwrite_realtime.loadbalancer.server.port=80
+      - traefik.http.routers.appwrite_realtime.entrypoints=websecure
+      - traefik.http.routers.appwrite_realtime.rule=(Host(`${APPWRITE_URL_ROOT}`) || Host(`www.${APPWRITE_URL_ROOT}`)) && PathPrefix(`/v1/realtime`)
+      - traefik.http.routers.appwrite_realtime.service=appwrite_realtime
+      - traefik.http.routers.appwrite_realtime.tls=true
+      - traefik.http.routers.appwrite_realtime.tls.certresolver=certresolver
+
+      - traefik.http.middlewares.wwwredirect.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.wwwredirect.redirectregex.replacement=https://$${1}
+      - traefik.http.routers.appwrite_realtime.middlewares=wwwredirect
     networks:
       - appwrite
     depends_on:
@@ -205,7 +183,6 @@ services:
   appwrite-worker-audits:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-audits
-    <<: *x-logging
     container_name: appwrite-worker-audits
     restart: unless-stopped
     networks:
@@ -231,7 +208,6 @@ services:
   appwrite-worker-webhooks:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-webhooks
-    <<: *x-logging
     container_name: appwrite-worker-webhooks
     restart: unless-stopped
     networks:
@@ -259,7 +235,6 @@ services:
   appwrite-worker-deletes:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-deletes
-    <<: *x-logging
     container_name: appwrite-worker-deletes
     restart: unless-stopped
     networks:
@@ -317,7 +292,6 @@ services:
   appwrite-worker-databases:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-databases
-    <<: *x-logging
     container_name: appwrite-worker-databases
     restart: unless-stopped
     networks:
@@ -343,7 +317,6 @@ services:
   appwrite-worker-builds:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-builds
-    <<: *x-logging
     container_name: appwrite-worker-builds
     restart: unless-stopped
     networks:
@@ -406,7 +379,6 @@ services:
   appwrite-worker-certificates:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-certificates
-    <<: *x-logging
     container_name: appwrite-worker-certificates
     restart: unless-stopped
     networks:
@@ -439,7 +411,6 @@ services:
   appwrite-worker-functions:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-functions
-    <<: *x-logging
     container_name: appwrite-worker-functions
     restart: unless-stopped
     networks:
@@ -477,7 +448,6 @@ services:
   appwrite-worker-mails:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-mails
-    <<: *x-logging
     container_name: appwrite-worker-mails
     restart: unless-stopped
     networks:
@@ -509,7 +479,6 @@ services:
   appwrite-worker-messaging:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-messaging
-    <<: *x-logging
     container_name: appwrite-worker-messaging
     restart: unless-stopped
     networks:
@@ -559,7 +528,6 @@ services:
   appwrite-worker-migrations:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-migrations
-    <<: *x-logging
     container_name: appwrite-worker-migrations
     restart: unless-stopped
     networks:
@@ -589,7 +557,6 @@ services:
   appwrite-task-maintenance:
     image: appwrite/appwrite:1.6.0
     entrypoint: maintenance
-    <<: *x-logging
     container_name: appwrite-task-maintenance
     restart: unless-stopped
     networks:
@@ -624,7 +591,6 @@ services:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-usage
     container_name: appwrite-worker-usage
-    <<: *x-logging
     restart: unless-stopped
     networks:
       - appwrite
@@ -651,7 +617,6 @@ services:
   appwrite-worker-usage-dump:
     image: appwrite/appwrite:1.6.0
     entrypoint: worker-usage-dump
-    <<: *x-logging
     container_name: appwrite-worker-usage-dump
     networks:
       - appwrite
@@ -679,7 +644,6 @@ services:
     image: appwrite/appwrite:1.6.0
     entrypoint: schedule-functions
     container_name: appwrite-task-scheduler-functions
-    <<: *x-logging
     restart: unless-stopped
     networks:
       - appwrite
@@ -704,7 +668,6 @@ services:
     image: appwrite/appwrite:1.6.0
     entrypoint: schedule-executions
     container_name: appwrite-task-scheduler-executions
-    <<: *x-logging
     restart: unless-stopped
     networks:
       - appwrite
@@ -729,7 +692,6 @@ services:
     image: appwrite/appwrite:1.6.0
     entrypoint: schedule-messages
     container_name: appwrite-task-scheduler-messages
-    <<: *x-logging
     restart: unless-stopped
     networks:
       - appwrite
@@ -753,7 +715,6 @@ services:
   appwrite-assistant:
     image: appwrite/assistant:0.4.0
     container_name: appwrite-assistant
-    <<: *x-logging
     restart: unless-stopped
     networks:
       - appwrite
@@ -763,7 +724,6 @@ services:
   openruntimes-executor:
     container_name: openruntimes-executor
     hostname: exc1
-    <<: *x-logging
     restart: unless-stopped
     stop_signal: SIGINT
     image: openruntimes/executor:0.6.11
@@ -812,7 +772,6 @@ services:
   mariadb:
     image: mariadb:10.11 # fix issues when upgrading using: mysql_upgrade -u root -p
     container_name: appwrite-mariadb
-    <<: *x-logging
     restart: unless-stopped
     networks:
       - appwrite
@@ -829,7 +788,6 @@ services:
   redis:
     image: redis:7.2.4-alpine
     container_name: appwrite-redis
-    <<: *x-logging
     restart: unless-stopped
     command: >
       redis-server

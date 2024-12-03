@@ -1,36 +1,47 @@
-x-logging: &x-logging
-  logging:
-    driver: "json-file"
-    options:
-      max-file: "5"
-      max-size: "10m"
+# https://github.com/bluepuma77/traefik-best-practice/blob/main/docker-traefik-dashboard-letsencrypt/docker-compose.yml
 
 services:
   traefik:
-    image: traefik:2.11
-    container_name: appwrite-traefik
-    <<: *x-logging
-    command:
-      - --providers.file.directory=/storage/config
-      - --providers.file.watch=true
-      - --providers.docker=true
-      - --providers.docker.exposedByDefault=false
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --certificatesresolvers.myresolver.acme.tlschallenge=true
-      - --certificatesresolvers.myresolver.acme.email=timote.wb@gmail.com
-      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
-    restart: unless-stopped
+    image: traefik:v3.2.1
     ports:
       - 80:80
       - 443:443
-    volumes:
-      - letsencrypt:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock
-      - appwrite-config:/storage/config:ro
-      - appwrite-certificates:/storage/certificates:ro
-    depends_on:
-      - appwrite
     networks:
-      - gateway
+      - proxy
+      - appwrite
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - letsencrypt:/letsencrypt
+      #- /var/log:/var/log
+    command:
+      - --api.dashboard=true
+      - --log.level=INFO
+      #- --log.filepath=/var/log/traefik.log
+      - --accesslog=true
+      #- --accesslog.filepath=/var/log/traefik-access.log
+      - --providers.docker.network=proxy
+      - --providers.docker.exposedByDefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entryPoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      # remove next line when using Traefik v2
+      - --entrypoints.websecure.asDefault=true 
+      - --entrypoints.websecure.http.tls.certresolver=certresolver
+      - --certificatesresolvers.certresolver.acme.email=${ADMIN_EMAIL}
+      - --certificatesresolvers.certresolver.acme.tlschallenge=true
+      - --certificatesresolvers.certresolver.acme.storage=/letsencrypt/acme.json
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik-dashboard.rule=(Host(`${TRAEFIK_URL_ROOT}`) || Host(`www.${TRAEFIK_URL_ROOT}`))
+      - traefik.http.routers.traefik-dashboard.service=api@internal
+
+      - traefik.http.middlewares.wwwredirect.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.wwwredirect.redirectregex.replacement=https://$${1}
+      - traefik.http.routers.traefik-dashboard.middlewares=wwwredirect
+
+      - traefik.http.routers.traefik-dashboard.middlewares=auth
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTH_UPL}
+    depends_on:
+      - timotewbcom
       - appwrite
