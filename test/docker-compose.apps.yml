@@ -10,14 +10,14 @@ services:
       - traefik.enable=true
       - traefik.http.services.timotewbcom.loadbalancer.server.port=3001
       - traefik.http.routers.timotewbcom.entrypoints=websecure
-      - traefik.http.routers.timotewbcom.rule=(Host(`timotewb.com`) || Host(`www.timotewb.com`))
+      - traefik.http.routers.timotewbcom.rule=(Host(`${TIMOTEWBCOM_URL_ROOT}`) || Host(`www.${TIMOTEWBCOM_URL_ROOT}`))
       - traefik.http.routers.timotewbcom.service=timotewbcom
       - traefik.http.routers.timotewbcom.tls=true
-      - traefik.http.routers.timotewbcom.tls.certresolver=myresolver
+      - traefik.http.routers.timotewbcom.tls.certresolver=certresolver
 
-      - traefik.http.middlewares.mywwwredirect.redirectregex.regex=^https://www\.(.*)
-      - traefik.http.middlewares.mywwwredirect.redirectregex.replacement=https://$${1}
-      - traefik.http.routers.timotewbcom.middlewares=mywwwredirect
+      - traefik.http.middlewares.wwwredirect.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.wwwredirect.redirectregex.replacement=https://$${1}
+      - traefik.http.routers.timotewbcom.middlewares=wwwredirect
     networks:
       - proxy
       - appwrite

@@ -2,6 +2,6 @@ COMPOSE_FILES=-f docker-compose.yml -f docker-compose.apps.yml -f docker-compose
 
 
 up:
-	docker compose $(COMPOSE_FILES) up
+	docker compose $(COMPOSE_FILES) up -d
 down:
 	docker compose $(COMPOSE_FILES) down
