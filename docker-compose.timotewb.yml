@@ -1,7 +1,7 @@
 
 services:
   timotewbcom:
-    image: ghcr.io/timotewb/timotewbcom:vps-dev
+    image: ghcr.io/timotewb/timotewbcom:${TIMOTEWBCOM_BRANCH}
     deploy:
       replicas: 3
       restart_policy:
