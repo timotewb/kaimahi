@@ -23,7 +23,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.asDefault=true
       - --entrypoints.websecure.http.tls.certresolver=certresolver
-      - --entrypoints.minecraft.address=:19132/udp
+      - --entrypoints.bedrock.address=:19132/udp
       - --certificatesresolvers.certresolver.acme.email=${ADMIN_EMAIL}
       - --certificatesresolvers.certresolver.acme.tlschallenge=true
       - --certificatesresolvers.certresolver.acme.storage=/letsencrypt/acme.json

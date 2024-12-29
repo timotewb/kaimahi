@@ -1,14 +1,14 @@
 services:
-  minecraft:
+  bedrock:
     image: ghcr.io/haepapa/minecraft-server:${MINECRAFT_BRANCH}
     deploy:
       restart_policy:
         condition: on-failure
     labels:
-      - traefik.udp.routers.minecraft.entrypoints=minecraft
-      - traefik.udp.routers.minecraft.service=minecraft
-      - traefik.udp.services.minecraft.loadbalancer.server.port=19132
+      - traefik.udp.routers.bedrock.entrypoints=bedrock
+      - traefik.udp.routers.bedrock.service=bedrock
+      - traefik.udp.services.bedrock.loadbalancer.server.port=19132
     networks:
       - proxy
     volumes:
-      - minecraft-worlds:/minecraft/worlds:rw
+      - bedrock-worlds:/minecraft/worlds:rw
