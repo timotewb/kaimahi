@@ -1,8 +1,6 @@
 services:
-  minecraft:
-    image: ghcr.io/haepapa/minecraft-server:${BEDROCK_BRANCH}
   bedrock:
-    image: ghcr.io/haepapa/minecraft-server:${MINECRAFT_BRANCH}
+    image: ghcr.io/haepapa/minecraft-server:${BEDROCK_BRANCH}
     deploy:
       restart_policy:
         condition: on-failure
