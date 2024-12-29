@@ -1,0 +1,14 @@
+services:
+  minecraft:
+    image: ghcr.io/haepapa/minecraft-server:${TIMOTEWBCOM_BRANCH}
+    deploy:
+      restart_policy:
+        condition: on-failure
+    labels:
+      - traefik.udp.routers.minecraft.entrypoints=minecraft
+      - traefik.udp.routers.minecraft.service=minecraft
+      - traefik.udp.services.minecraft.loadbalancer.server.port=19132
+    networks:
+      - proxy
+    volumes:
+      - minecraft-worlds:/minecraft/worlds:rw

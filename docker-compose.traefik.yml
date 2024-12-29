@@ -4,6 +4,7 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 19132:19132/udp
     networks:
       - proxy
       - appwrite
@@ -20,8 +21,9 @@ services:
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entryPoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.websecure.address=:443
-      - --entrypoints.websecure.asDefault=true 
+      - --entrypoints.websecure.asDefault=true
       - --entrypoints.websecure.http.tls.certresolver=certresolver
+      - --entrypoints.minecraft.address=:19132/udp
       - --certificatesresolvers.certresolver.acme.email=${ADMIN_EMAIL}
       - --certificatesresolvers.certresolver.acme.tlschallenge=true
       - --certificatesresolvers.certresolver.acme.storage=/letsencrypt/acme.json
