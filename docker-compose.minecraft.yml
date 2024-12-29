@@ -5,10 +5,11 @@ services:
       restart_policy:
         condition: on-failure
     labels:
+      - traefik.enable=true
       - traefik.udp.routers.bedrock.entrypoints=bedrock
       - traefik.udp.routers.bedrock.service=bedrock
       - traefik.udp.services.bedrock.loadbalancer.server.port=19132
     networks:
-      - proxy
+        - proxy
     volumes:
-      - bedrock-worlds:/minecraft/worlds:rw
+        - bedrock-worlds:/minecraft/worlds:rw
