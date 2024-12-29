@@ -17,5 +17,5 @@ volumes:
   appwrite-functions:
   appwrite-builds:
   appwrite-config:
-  minecraft-worlds:
-    name: minecraft-worlds
+  bedrock-worlds:
+    name: bedrock-worlds
