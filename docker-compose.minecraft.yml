@@ -1,15 +1,40 @@
 services:
-  bedrock:
-    image: ghcr.io/haepapa/minecraft-server:${BEDROCK_BRANCH}
+  minecraft:
+    image: ghcr.io/haepapa/minecraft-server:${JAVA_BRANCH}
     deploy:
       restart_policy:
         condition: on-failure
     labels:
       - traefik.enable=true
-      - traefik.udp.routers.bedrock.entrypoints=bedrock
-      - traefik.udp.routers.bedrock.service=bedrock
-      - traefik.udp.services.bedrock.loadbalancer.server.port=19132
+      - traefik.udp.routers.minecraft-bedrock32.entrypoints=minecraft-bedrock32
+      - traefik.udp.routers.minecraft-bedrock32.service=minecraft-bedrock32
+      - traefik.udp.services.minecraft-bedrock32.loadbalancer.server.port=19132
+
+      - traefik.tcp.routers.minecraft-bedrock32-tcp.entrypoints=minecraft-bedrock32-tcp
+      - traefik.tcp.routers.minecraft-bedrock32-tcp.service=minecraft-bedrock32-tcp
+      - traefik.tcp.routers.minecraft-bedrock32-tcp.rule=HostSNI(`*`)
+      - traefik.tcp.services.minecraft-bedrock32-tcp.loadbalancer.server.port=19132
+
+      - traefik.udp.routers.minecraft-bedrock33.entrypoints=minecraft-bedrock33
+      - traefik.udp.routers.minecraft-bedrock33.service=minecraft-bedrock33
+      - traefik.udp.services.minecraft-bedrock33.loadbalancer.server.port=19133
+
+      - traefik.tcp.routers.minecraft-bedrock33-tcp.entrypoints=minecraft-bedrock33-tcp
+      - traefik.tcp.routers.minecraft-bedrock33-tcp.service=minecraft-bedrock33-tcp
+      - traefik.tcp.routers.minecraft-bedrock33-tcp.rule=HostSNI(`*`)
+      - traefik.tcp.services.minecraft-bedrock33-tcp.loadbalancer.server.port=19133
+
+      - traefik.udp.routers.minecraft-java65.entrypoints=minecraft-java65
+      - traefik.udp.routers.minecraft-java65.service=minecraft-java65
+      - traefik.udp.services.minecraft-java65.loadbalancer.server.port=25565
+
+      - traefik.tcp.routers.minecraft-java65-tcp.entrypoints=minecraft-java65-tcp
+      - traefik.tcp.routers.minecraft-java65-tcp.service=minecraft-java65-tcp
+      - traefik.tcp.routers.minecraft-java65-tcp.rule=HostSNI(`*`)
+      - traefik.tcp.services.minecraft-java65-tcp.loadbalancer.server.port=25565
     networks:
         - proxy
     volumes:
-        - bedrock-worlds:/minecraft/worlds:rw
+        - minecraft-world:/minecraft/world:rw
+        - minecraft-world-nether:/minecraft/world_nether:rw
+        - minecraft-world-the-end:/minecraft/world_the_end:rw

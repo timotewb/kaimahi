@@ -5,6 +5,11 @@ services:
       - 80:80
       - 443:443
       - 19132:19132/udp
+      - 19133:19133/udp
+      - 25565:25565/udp
+      - 19132:19132/tcp
+      - 19133:19133/tcp
+      - 25565:25565/tcp
     networks:
       - proxy
       - appwrite
@@ -17,13 +22,23 @@ services:
       - --accesslog=true
       - --providers.docker.network=proxy
       - --providers.docker.exposedByDefault=false
+      
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entryPoints.web.http.redirections.entrypoint.scheme=https
+
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.asDefault=true
       - --entrypoints.websecure.http.tls.certresolver=certresolver
-      - --entrypoints.bedrock.address=:19132/udp
+
+      - --entrypoints.minecraft-bedrock32.address=:19132/udp
+      - --entrypoints.minecraft-bedrock33.address=:19133/udp
+      - --entrypoints.minecraft-java65.address=:25565/udp
+
+      - --entrypoints.minecraft-bedrock32-tcp.address=:19132/tcp
+      - --entrypoints.minecraft-bedrock33-tcp.address=:19133/tcp
+      - --entrypoints.minecraft-java65-tcp.address=:25565/tcp
+
       - --certificatesresolvers.certresolver.acme.email=${ADMIN_EMAIL}
       - --certificatesresolvers.certresolver.acme.tlschallenge=true
       - --certificatesresolvers.certresolver.acme.storage=/letsencrypt/acme.json
@@ -40,5 +55,5 @@ services:
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTH_UPL}
     depends_on:
       - timotewbcom
-      - bedrock
+      - minecraft
       - appwrite

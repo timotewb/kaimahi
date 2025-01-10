@@ -8,7 +8,6 @@ networks:
 
 volumes:
   letsencrypt:
-    name: letsencrypt
   appwrite-mariadb:
   appwrite-redis:
   appwrite-cache:
@@ -17,5 +16,6 @@ volumes:
   appwrite-functions:
   appwrite-builds:
   appwrite-config:
-  bedrock-worlds:
-    name: bedrock-worlds
+  minecraft-world:
+  minecraft-world-nether:
+  minecraft-world-the-end:
