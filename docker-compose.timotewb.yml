@@ -18,6 +18,8 @@ services:
       - traefik.http.middlewares.wwwredirect.redirectregex.regex=^https://www\.(.*)
       - traefik.http.middlewares.wwwredirect.redirectregex.replacement=https://$${1}
       - traefik.http.routers.timotewbcom.middlewares=wwwredirect
+
+      - com.centurylinklabs.watchtower.enable=true
     networks:
       - proxy
       - appwrite

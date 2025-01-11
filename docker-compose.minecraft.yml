@@ -32,6 +32,8 @@ services:
       - traefik.tcp.routers.minecraft-java65-tcp.service=minecraft-java65-tcp
       - traefik.tcp.routers.minecraft-java65-tcp.rule=HostSNI(`*`)
       - traefik.tcp.services.minecraft-java65-tcp.loadbalancer.server.port=25565
+
+      - com.centurylinklabs.watchtower.enable=true
     networks:
         - proxy
     volumes:
