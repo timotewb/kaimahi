@@ -55,5 +55,6 @@ services:
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTH_UPL}
     depends_on:
       - timotewbcom
+      - haepapacom
       - minecraft
       - appwrite

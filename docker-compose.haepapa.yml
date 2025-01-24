@@ -1,0 +1,25 @@
+
+services:
+  haepapacom:
+    image: ghcr.io/haepapa/haepapacom:${HAEPAPACOM_BRANCH}
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.haepapacom.loadbalancer.server.port=3000
+      - traefik.http.routers.haepapacom.entrypoints=websecure
+      - traefik.http.routers.haepapacom.rule=(Host(`${HAEPAPACOM_URL_ROOT}`) || Host(`www.${HAEPAPACOM_URL_ROOT}`))
+      - traefik.http.routers.haepapacom.service=haepapacom
+      - traefik.http.routers.haepapacom.tls=true
+      - traefik.http.routers.haepapacom.tls.certresolver=certresolver
+
+      - traefik.http.middlewares.wwwredirect.redirectregex.regex=^https://www\.(.*)
+      - traefik.http.middlewares.wwwredirect.redirectregex.replacement=https://$${1}
+      - traefik.http.routers.haepapacom.middlewares=wwwredirect
+
+      - com.centurylinklabs.watchtower.enable=true
+    networks:
+      - proxy
+      - appwrite
